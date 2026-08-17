@@ -1225,78 +1225,57 @@ function taxesTotals(){
 /* =========================================================
    NAVEGACIÓN
 ========================================================= */
-
 function renderNav(){
 
   const nav =
-    document.getElementById(
-      "nav"
-    );
+    document.getElementById("nav");
 
+  nav.innerHTML = "";
 
   const items = [
-
     "Dashboard",
-
     ...months,
-
     "Ahorros",
-
     "Taxes",
-
     "TO DO"
-
   ];
 
+  items.forEach(item => {
 
-  nav.innerHTML="";
+    const button =
+      document.createElement("button");
 
+    button.textContent = item;
 
-  items.forEach(
-    item=>{
+    if(state.active === item){
 
-      const button =
-        document.createElement(
-          "button"
-        );
-
-
-      button.textContent =
-        item;
-
-
-      if(
-        state.active === item
-      ){
-
-        button.classList.add(
-          "active"
-        );
-
-      }
-
-
-      button.addEventListener(
-        "click",
-        ()=>go(item)
-      );
-
-
-      nav.appendChild(
-        button
-      );
+      button.classList.add("active");
 
     }
-  );
-/* NUEVO BOTÓN */
+
+    button.addEventListener(
+      "click",
+      () => go(item)
+    );
+
+    nav.appendChild(button);
+
+  });
+
+
+  /* =========================================================
+     BOTÓN NUEVO MES
+  ========================================================= */
 
   const newMonthButton =
-    document.createElement(
-      "button"
-    );
+    document.createElement("button");
 
   newMonthButton.textContent =
     "+ Nuevo mes";
+
+  newMonthButton.classList.add(
+    "new-month-button"
+  );
 
   newMonthButton.addEventListener(
     "click",
@@ -1306,6 +1285,7 @@ function renderNav(){
   nav.appendChild(
     newMonthButton
   );
+
 }
 
 
