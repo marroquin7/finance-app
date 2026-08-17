@@ -222,7 +222,55 @@ function createDefaultMonth(){
   };
 
 }
+/* =========================================================
+   CREAR MES NUEVO — TODO EN CERO
+========================================================= */
 
+function createEmptyMonth(){
+
+  return {
+
+    incomes:[
+      {
+        name:"Salario Cesar",
+        expected:0,
+        actual:0
+      },
+
+      {
+        name:"Salario Miriam",
+        expected:0,
+        actual:0
+      },
+
+      {
+        name:"SBDC Cesar/Otros",
+        expected:0,
+        actual:0
+      },
+
+      {
+        name:"Restante Mes Previo",
+        expected:0,
+        actual:0
+      }
+    ],
+
+    budgets:
+      Object.fromEntries(
+        defaultCategories.map(
+          c=>[
+            c.name,
+            0
+          ]
+        )
+      ),
+
+    transactions:[]
+
+  };
+
+}
 
 /* =========================================================
    ESTADO POR DEFECTO
@@ -417,7 +465,27 @@ function loadState(){
     if(!parsed.todo){
       parsed.todo=[];
     }
+/* 
+  Recuperamos meses creados
+  dinámicamente y los añadimos
+  a la navegación.
+*/
 
+Object.keys(
+  parsed.months
+).forEach(
+  m=>{
+
+    if(
+      !months.includes(m)
+    ){
+
+      months.push(m);
+
+    }
+
+  }
+);
 
     months.forEach(
       m=>{
@@ -1220,7 +1288,24 @@ function renderNav(){
 
     }
   );
+/* NUEVO BOTÓN */
 
+  const newMonthButton =
+    document.createElement(
+      "button"
+    );
+
+  newMonthButton.textContent =
+    "+ Nuevo mes";
+
+  newMonthButton.addEventListener(
+    "click",
+    addNewMonth
+  );
+
+  nav.appendChild(
+    newMonthButton
+  );
 }
 
 
@@ -1234,7 +1319,58 @@ function go(x){
   render();
 
 }
+/* =========================================================
+   NUEVO MES
+========================================================= */
 
+function addNewMonth(){
+
+  const name =
+    prompt(
+      "Nombre del nuevo mes:"
+    );
+
+  if(!name){
+    return;
+  }
+
+  const monthName =
+    name.trim();
+
+  if(!monthName){
+    return;
+  }
+
+  if(
+    state.months[
+      monthName
+    ]
+  ){
+
+    alert(
+      "Ese mes ya existe."
+    );
+
+    return;
+  }
+
+  state.months[
+    monthName
+  ] =
+    createEmptyMonth();
+
+  months.push(
+    monthName
+  );
+
+  state.active =
+    monthName;
+
+  save();
+
+  render();
+
+}
 
 /* =========================================================
    RENDER PRINCIPAL
