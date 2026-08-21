@@ -13,8 +13,6 @@ const months = [
   "Julio",
   "Agosto"
 ];
-
-
 const defaultCategories = [
 
   {
@@ -102,8 +100,6 @@ const defaultCategories = [
   }
 
 ];
-
-
 const savingsAccounts = [
 
   "Marcus Miriam",
@@ -113,8 +109,6 @@ const savingsAccounts = [
   "SoFi"
 
 ];
-
-
 const paymentAccounts = [
 
   "SoFi",
@@ -125,8 +119,6 @@ const paymentAccounts = [
   "M WF"
 
 ];
-
-
 const savingsMovementTypes = [
 
   "Depósito",
@@ -134,9 +126,6 @@ const savingsMovementTypes = [
   "Intereses"
 
 ];
-
-
-
 /* =========================================================
    MES POR FECHA
 ========================================================= */
@@ -160,8 +149,6 @@ function monthFromDate(dateString){
     date.getMonth()
   ] || null;
 }
-
-
 /* =========================================================
    CREAR MES
 ========================================================= */
@@ -400,8 +387,6 @@ const defaultState = {
   todo:[]
 
 };
-
-
 /* =========================================================
    CARGAR ESTADO
 ========================================================= */
@@ -425,8 +410,6 @@ function loadState(){
 
     const parsed =
       JSON.parse(saved);
-
-
     if(
       !parsed ||
       !parsed.months
@@ -437,8 +420,6 @@ function loadState(){
       );
 
     }
-
-
     if(!parsed.recurring){
       parsed.recurring=[];
     }
@@ -483,8 +464,6 @@ Object.keys(
             createDefaultMonth();
 
         }
-
-
         if(
           !parsed.months[m].transactions
         ){
@@ -492,8 +471,6 @@ Object.keys(
           parsed.months[m].transactions=[];
 
         }
-
-
         if(
           !parsed.months[m].incomes
         ){
@@ -502,8 +479,6 @@ Object.keys(
             createDefaultMonth().incomes;
 
         }
-
-
         if(
           !parsed.months[m].budgets
         ){
@@ -519,8 +494,6 @@ Object.keys(
             );
 
         }
-
-
         /*
           Aseguramos que la categoría
           Ahorros exista en meses antiguos.
@@ -536,8 +509,6 @@ Object.keys(
 
       }
     );
-
-
     /*
       Añadimos IDs a recurrentes
       antiguos.
@@ -558,8 +529,6 @@ Object.keys(
 
       }
     );
-
-
     /*
       Compatibilidad con movimientos
       de ahorros antiguos.
@@ -611,8 +580,6 @@ Object.keys(
 
         })
       );
-
-
     return parsed;
 
   }catch(error){
@@ -629,12 +596,8 @@ Object.keys(
   }
 
 }
-
-
 let state =
   loadState();
-
-
 /* =========================================================
    UTILIDADES
 ========================================================= */
@@ -652,8 +615,6 @@ function money(n){
   );
 
 }
-
-
 function esc(s){
 
   return String(
@@ -676,8 +637,6 @@ function esc(s){
   );
 
 }
-
-
 function save(){
 
   try{
@@ -697,8 +656,6 @@ function save(){
   }
 
 }
-
-
 function month(){
 
   if(
@@ -716,8 +673,6 @@ function month(){
   ];
 
 }
-
-
 /* =========================================================
    TOTALES MENSUALES
 ========================================================= */
@@ -733,8 +688,6 @@ function totals(m){
         ),
       0
     );
-
-
   const incExp =
     m.incomes.reduce(
       (a,x)=>
@@ -744,18 +697,12 @@ function totals(m){
         ),
       0
     );
-
-
   const by={};
-
-
   m.transactions.forEach(
     t=>{
 
       const cat =
         t.cat || "Otros";
-
-
       by[cat] =
         (
           by[cat] || 0
@@ -766,13 +713,9 @@ function totals(m){
 
     }
   );
-
-
   let expense=0;
 
   let budget=0;
-
-
   Object.entries(
     m.budgets
   ).forEach(
@@ -786,8 +729,6 @@ function totals(m){
 
     }
   );
-
-
   return {
 
     inc,
@@ -806,8 +747,6 @@ function totals(m){
   };
 
 }
-
-
 /* =========================================================
    CUENTAS / TARJETAS
 ========================================================= */
@@ -815,8 +754,6 @@ function totals(m){
 function accountTotals(m){
 
   const accounts={};
-
-
   m.transactions.forEach(
     t=>{
 
@@ -824,13 +761,9 @@ function accountTotals(m){
         String(
           t.account || ""
         ).trim();
-
-
       if(!account){
         return;
       }
-
-
       accounts[account] =
         (
           accounts[account] || 0
@@ -841,8 +774,6 @@ function accountTotals(m){
 
     }
   );
-
-
   return Object.entries(
     accounts
   ).sort(
@@ -850,8 +781,6 @@ function accountTotals(m){
   );
 
 }
-
-
 /* =========================================================
    AHORROS
 ========================================================= */
@@ -874,15 +803,11 @@ function savingsAccountBalances(){
         ]
       )
     );
-
-
   state.savings.forEach(
     movement=>{
 
       const account =
         movement.account;
-
-
       if(
         !savingsAccounts.includes(
           account
@@ -892,14 +817,10 @@ function savingsAccountBalances(){
         return;
 
       }
-
-
       const amount =
         Number(
           movement.amount || 0
         );
-
-
       if(
         movement.type === "Retiro"
       ){
@@ -917,19 +838,13 @@ function savingsAccountBalances(){
 
     }
   );
-
-
   return balances;
 
 }
-
-
 function savingsTotalExcludingSofi(){
 
   const balances =
     savingsAccountBalances();
-
-
   return savingsAccounts
     .filter(
       account=>
@@ -945,14 +860,10 @@ function savingsTotalExcludingSofi(){
     );
 
 }
-
-
 function savingsTotalAll(){
 
   const balances =
     savingsAccountBalances();
-
-
   return savingsAccounts
     .reduce(
       (sum,account)=>
@@ -964,8 +875,6 @@ function savingsTotalAll(){
     );
 
 }
-
-
 /*
   Convierte automáticamente una transacción
   mensual con categoría Ahorros en movimiento
@@ -996,8 +905,6 @@ function syncSavingsFromTransaction(
           x.id ===
           transaction.savingsMovementId
       );
-
-
     if(
       existingIndex >= 0
     ){
@@ -1026,8 +933,6 @@ function syncSavingsFromTransaction(
     }
 
   }
-
-
   /*
     Solo creamos movimiento cuando
     la categoría sea Ahorros.
@@ -1040,13 +945,9 @@ function syncSavingsFromTransaction(
     return;
 
   }
-
-
   const movementId =
     "savtx-" +
     transaction.id;
-
-
   /*
     Si por alguna razón ya existe,
     no duplicamos.
@@ -1058,15 +959,11 @@ function syncSavingsFromTransaction(
         x.transactionId ===
         transaction.id
     );
-
-
   if(already){
 
     return;
 
   }
-
-
   /*
     Una transacción de Ahorros representa
     por defecto un depósito.
@@ -1114,14 +1011,10 @@ function syncSavingsFromTransaction(
       "Creado desde transacción"
 
   });
-
-
   transaction.savingsMovementId =
     movementId;
 
 }
-
-
 function syncAllSavingsTransactions(){
 
   months.forEach(
@@ -1131,8 +1024,6 @@ function syncAllSavingsTransactions(){
         state.months[
           monthName
         ];
-
-
       m.transactions.forEach(
         transaction=>{
 
@@ -1155,9 +1046,6 @@ function syncAllSavingsTransactions(){
   );
 
 }
-
-
-
 /* =========================================================
    NAVEGACIÓN
 ========================================================= */
@@ -1196,8 +1084,6 @@ function renderNav(){
     nav.appendChild(button);
 
   });
-
-
   /* =========================================================
      BOTÓN NUEVO MES
   ========================================================= */
@@ -1222,8 +1108,6 @@ function renderNav(){
   );
 
 }
-
-
 function go(x){
 
   state.active =
@@ -1303,20 +1187,12 @@ function render(){
     syncAllSavingsTransactions();
 
     save();
-
-
     renderNav();
-
-
     const app =
       document.getElementById(
         "app"
       );
-
-
     app.innerHTML="";
-
-
     if(
       state.active === "Dashboard"
     ){
@@ -1349,8 +1225,6 @@ function render(){
   }catch(error){
 
     console.error(error);
-
-
     document.getElementById(
       "app"
     ).innerHTML = `
@@ -1379,8 +1253,6 @@ function render(){
   }
 
 }
-
-
 /* =========================================================
    DASHBOARD
 ========================================================= */
@@ -1395,8 +1267,6 @@ function dashboard(a){
           totals(
             state.months[m]
           );
-
-
         return `
 
           <tr>
@@ -1430,23 +1300,14 @@ function dashboard(a){
 
       }
     ).join("");
-
-
   const t =
     totals(
       state.months.Agosto
     );
-
-
   const savingsBalances =
     savingsAccountBalances();
-
-
   const savingsTotal =
     savingsTotalExcludingSofi();
-
-
-
   const savingsRows =
     savingsAccounts.map(
       account=>`
@@ -1473,8 +1334,6 @@ function dashboard(a){
 
       `
     ).join("");
-
-
   a.innerHTML = `
 
     <div class="toolbar">
@@ -1486,8 +1345,6 @@ function dashboard(a){
         Exportar datos
 
       </button>
-
-
       <label class="btn">
 
         Importar datos
@@ -1499,8 +1356,6 @@ function dashboard(a){
           hidden>
 
       </label>
-
-
       <button
         id="resetBtn">
 
@@ -1509,8 +1364,6 @@ function dashboard(a){
       </button>
 
     </div>
-
-
     <!-- KPIS -->
 
     <div class="kpis">
@@ -1526,8 +1379,6 @@ function dashboard(a){
         </div>
 
       </div>
-
-
       <div class="kpi">
 
         <div class="label">
@@ -1539,8 +1390,6 @@ function dashboard(a){
         </div>
 
       </div>
-
-
       <div class="kpi">
 
         <div class="label">
@@ -1552,8 +1401,6 @@ function dashboard(a){
         </div>
 
       </div>
-
-
       <div class="kpi">
 
         <div class="label">
@@ -1567,8 +1414,6 @@ function dashboard(a){
       </div>
 
     </div>
-
-
     <!-- RESUMEN MENSUAL -->
 
     <div class="card">
@@ -1604,8 +1449,6 @@ function dashboard(a){
       </table>
 
     </div>
-
-
     <!-- AHORROS -->
 
     <div class="dashboard-summary-grid">
@@ -1627,8 +1470,6 @@ function dashboard(a){
           </button>
 
         </div>
-
-
         <table>
 
           <tr>
@@ -1644,8 +1485,6 @@ function dashboard(a){
           </tr>
 
           ${savingsRows}
-
-
           <tr class="total">
 
             <td>
@@ -1657,8 +1496,6 @@ function dashboard(a){
             </td>
 
           </tr>
-
-
           <tr>
 
             <td>
@@ -1719,8 +1556,6 @@ function dashboard(a){
     </div>
 
   `;
-
-
   document
     .getElementById(
       "exportBtn"
@@ -1729,8 +1564,6 @@ function dashboard(a){
       "click",
       downloadBackup
     );
-
-
   document
     .getElementById(
       "importFile"
@@ -1739,8 +1572,6 @@ function dashboard(a){
       "change",
       importBackup
     );
-
-
   document
     .getElementById(
       "resetBtn"
@@ -1749,8 +1580,6 @@ function dashboard(a){
       "click",
       resetData
     );
-
-
   document
     .getElementById(
       "goSavings"
@@ -1761,8 +1590,6 @@ function dashboard(a){
     );
 
 }
-
-
 /* =========================================================
    PÁGINA MENSUAL
 ========================================================= */
@@ -1771,24 +1598,16 @@ function monthly(a){
 
   const m =
     month();
-
-
   const t =
     totals(m);
-
-
   const accountData =
     accountTotals(m);
-
-
   const totalAccounts =
     accountData.reduce(
       (sum,x)=>
         sum+x[1],
       0
     );
-
-
   /*
     INGRESOS
   */
@@ -1838,8 +1657,6 @@ function monthly(a){
 
       `
     ).join("");
-
-
   /*
     CATEGORÍAS
   */
@@ -1852,12 +1669,8 @@ function monthly(a){
 
         const act =
           t.by[c] || 0;
-
-
         const rem =
           Number(b)-act;
-
-
         return `
 
           <tr>
@@ -1923,8 +1736,6 @@ function monthly(a){
 
       }
     ).join("");
-
-
   /*
     PAGOS RECURRENTES
   */
@@ -1933,8 +1744,6 @@ function monthly(a){
     renderRecurringRows(
       state.active
     );
-
-
   /*
     GASTOS POR CUENTA
   */
@@ -1952,8 +1761,6 @@ function monthly(a){
                 totalAccounts
               ) * 100
             : 0;
-
-
           return `
 
             <tr>
@@ -1965,8 +1772,6 @@ function monthly(a){
                   ${esc(account)}
 
                 </div>
-
-
                 <div
                   class="account-bar">
 
@@ -2015,8 +1820,6 @@ function monthly(a){
       </tr>
 
     `;
-
-
   /*
     HTML
 
@@ -2039,8 +1842,6 @@ function monthly(a){
       </button>
 
     </div>
-
-
     <!-- KPIS -->
 
     <div class="kpis">
@@ -2056,8 +1857,6 @@ function monthly(a){
         </div>
 
       </div>
-
-
       <div class="kpi">
 
         <div class="label">
@@ -2069,8 +1868,6 @@ function monthly(a){
         </div>
 
       </div>
-
-
       <div class="kpi">
 
         <div class="label">
@@ -2082,8 +1879,6 @@ function monthly(a){
         </div>
 
       </div>
-
-
       <div class="kpi">
 
         <div class="label">
@@ -2097,8 +1892,6 @@ function monthly(a){
       </div>
 
     </div>
-
-
     <!--
       COLUMNA IZQUIERDA:
       INGRESOS
@@ -2106,11 +1899,7 @@ function monthly(a){
     -->
 
     <div class="month-layout">
-
-
       <div class="month-left">
-
-
         <!-- INGRESOS -->
 
         <div class="card">
@@ -2168,8 +1957,6 @@ function monthly(a){
           </table>
 
         </div>
-
-
         <!-- INGRESOS VS GASTOS -->
 
         <div class="card">
@@ -2288,16 +2075,12 @@ function monthly(a){
         </div>
 
       </div>
-
-
       <div class="info">
 
         Este resumen se calcula automáticamente
         a partir de las transacciones del mes.
 
       </div>
-
-
       <table>
 
         <tr>
@@ -2317,8 +2100,6 @@ function monthly(a){
         </tr>
 
         ${accountRows}
-
-
         ${
           accountData.length
           ? `
@@ -2346,12 +2127,6 @@ function monthly(a){
       </table>
 
     </div>
-
-
-      
-
-    
-
       </div>
            <!--
         COLUMNA DERECHA:
@@ -2359,8 +2134,6 @@ function monthly(a){
       -->
 
       <div class="month-right">
-
-
         <!-- GASTOS -->
 
         <div class="card">
@@ -2431,8 +2204,6 @@ function monthly(a){
             </tr>
 
           </table>
-
-
           <!-- AÑADIR CATEGORÍA -->
 
           <div class="section-title">
@@ -2440,8 +2211,6 @@ function monthly(a){
             Añadir categoría de gastos
 
           </div>
-
-
           <div class="category-add-box">
 
             <input
@@ -2463,8 +2232,6 @@ function monthly(a){
             </button>
 
           </div>
-
-
           <div class="small"
                style="margin-top:8px">
 
@@ -2499,8 +2266,6 @@ function monthly(a){
         </button>
 
       </div>
-
-
       <div class="info">
 
         Los pagos aparecen en el mes correspondiente
@@ -2510,8 +2275,6 @@ function monthly(a){
         automáticamente en una transacción.
 
       </div>
-
-
       <div class="recurring-table">
 
         <table>
@@ -2555,8 +2318,6 @@ function monthly(a){
       </div>
 
     </div>
-
-
     <!-- TRANSACCIONES -->
 
     <div
@@ -2578,8 +2339,6 @@ function monthly(a){
         </button>
 
       </div>
-
-
       <div class="transaction-table">
 
         ${renderTransactionTable(m)}
@@ -2589,8 +2348,6 @@ function monthly(a){
     </div>
 
   `;
-
-
   /*
     Botones
   */
@@ -2603,8 +2360,6 @@ function monthly(a){
       "click",
       addTx
     );
-
-
   document
     .getElementById(
       "newTxBottom"
@@ -2613,8 +2368,6 @@ function monthly(a){
       "click",
       addTx
     );
-
-
   document
     .getElementById(
       "addRecurring"
@@ -2623,8 +2376,6 @@ function monthly(a){
       "click",
       addRecurring
     );
-
-
   /*
     Ingresos
   */
@@ -2642,18 +2393,12 @@ function monthly(a){
             Number(
               this.dataset.income
             );
-
-
           const field =
             this.dataset.field;
-
-
           m.incomes[i][field] =
             Number(
               this.value
             ) || 0;
-
-
           save();
 
           render();
@@ -2663,8 +2408,6 @@ function monthly(a){
 
     }
   );
-
-
   /*
     Presupuestos
   */
@@ -2680,16 +2423,12 @@ function monthly(a){
 
           const category =
             this.dataset.budget;
-
-
           m.budgets[
             category
           ] =
             Number(
               this.value
             ) || 0;
-
-
           save();
 
           render();
@@ -2699,8 +2438,6 @@ function monthly(a){
 
     }
   );
-
-
   /*
     Eliminar categoría
   */
@@ -2716,8 +2453,6 @@ function monthly(a){
 
           const category =
             this.dataset.deleteCategory;
-
-
           if(
             category === "Ahorros"
           ){
@@ -2729,8 +2464,6 @@ function monthly(a){
             return;
 
           }
-
-
           if(
             category === "Otros"
           ){
@@ -2742,8 +2475,6 @@ function monthly(a){
             return;
 
           }
-
-
           const used =
             months.some(
               monthName=>
@@ -2754,8 +2485,6 @@ function monthly(a){
                     tx.cat === category
                 )
             );
-
-
           const message =
             used
 
@@ -2771,8 +2500,6 @@ function monthly(a){
               category +
               "?"
             );
-
-
           if(
             confirm(message)
           ){
@@ -2788,8 +2515,6 @@ function monthly(a){
 
               }
             );
-
-
             save();
 
             render();
@@ -2801,8 +2526,6 @@ function monthly(a){
 
     }
   );
-
-
   /*
     Añadir categoría
   */
@@ -2815,15 +2538,11 @@ function monthly(a){
       "click",
       addExpenseCategory
     );
-
-
   /*
     Transacciones
   */
 
   attachTransactionEvents(a);
-
-
   /*
     Recurrentes
   */
@@ -2831,8 +2550,6 @@ function monthly(a){
   attachRecurringEvents(a);
 
 }
-
-
 /* =========================================================
    AÑADIR CATEGORÍA
 ========================================================= */
@@ -2843,26 +2560,18 @@ function addExpenseCategory(){
     document.getElementById(
       "newCategoryName"
     );
-
-
   const budgetInput =
     document.getElementById(
       "newCategoryBudget"
     );
-
-
   const name =
     String(
       nameInput.value || ""
     ).trim();
-
-
   const budget =
     Number(
       budgetInput.value
     ) || 0;
-
-
   if(!name){
 
     alert(
@@ -2872,8 +2581,6 @@ function addExpenseCategory(){
     return;
 
   }
-
-
   if(
     months.some(
       monthName=>
@@ -2893,8 +2600,6 @@ function addExpenseCategory(){
     return;
 
   }
-
-
   months.forEach(
     monthName=>{
 
@@ -2905,15 +2610,11 @@ function addExpenseCategory(){
 
     }
   );
-
-
   save();
 
   render();
 
 }
-
-
 /* =========================================================
    PAGOS RECURRENTES
 ========================================================= */
@@ -2923,8 +2624,6 @@ function renderRecurringRows(
 ){
 
   const rows=[];
-
-
   state.recurring.forEach(
     (p,index)=>{
 
@@ -2932,16 +2631,12 @@ function renderRecurringRows(
         monthFromDate(
           p.next
         );
-
-
       if(!paymentMonth){
 
         paymentMonth =
           monthName;
 
       }
-
-
       if(
         paymentMonth !==
         monthName
@@ -2950,15 +2645,11 @@ function renderRecurringRows(
         return;
 
       }
-
-
       const registered =
         isRecurringRegistered(
           p.id,
           monthName
         );
-
-
       rows.push(`
 
         <tr>
@@ -2971,8 +2662,6 @@ function renderRecurringRows(
               data-field="name">
 
           </td>
-
-
           <td>
 
             <select
@@ -3002,8 +2691,6 @@ function renderRecurringRows(
             </select>
 
           </td>
-
-
           <td>
 
             <input
@@ -3014,8 +2701,6 @@ function renderRecurringRows(
               data-field="amount">
 
           </td>
-
-
           <td>
 
             <input
@@ -3024,8 +2709,6 @@ function renderRecurringRows(
               data-field="freq">
 
           </td>
-
-
           <td>
 
             <input
@@ -3035,8 +2718,6 @@ function renderRecurringRows(
               data-field="next">
 
           </td>
-
-
           <td>
 
             <select
@@ -3077,8 +2758,6 @@ function renderRecurringRows(
             </select>
 
           </td>
-
-
           <td class="actions">
 
             ${
@@ -3108,8 +2787,6 @@ function renderRecurringRows(
 
               `
             }
-
-
             <button
               class="danger small-btn"
               data-delete-rp="${index}">
@@ -3126,8 +2803,6 @@ function renderRecurringRows(
 
     }
   );
-
-
   if(!rows.length){
 
     return `
@@ -3153,13 +2828,9 @@ function renderRecurringRows(
     `;
 
   }
-
-
   return rows.join("");
 
 }
-
-
 /* =========================================================
    COMPROBAR RECURRENTE
 ========================================================= */
@@ -3173,13 +2844,9 @@ function isRecurringRegistered(
     state.months[
       monthName
     ];
-
-
   if(!m){
     return false;
   }
-
-
   return m.transactions.some(
     t=>
       t.recurringId ===
@@ -3187,8 +2854,6 @@ function isRecurringRegistered(
   );
 
 }
-
-
 /* =========================================================
    REGISTRAR RECURRENTE
 ========================================================= */
@@ -3201,41 +2866,29 @@ function registerRecurring(
     state.recurring[
       index
     ];
-
-
   if(!p){
     return;
   }
-
-
   let targetMonth =
     monthFromDate(
       p.next
     );
-
-
   if(!targetMonth){
 
     targetMonth =
       state.active;
 
   }
-
-
   const m =
     state.months[
       targetMonth
     ];
-
-
   const already =
     m.transactions.some(
       t=>
         t.recurringId ===
         p.id
     );
-
-
   if(already){
 
     alert(
@@ -3246,8 +2899,6 @@ function registerRecurring(
     return;
 
   }
-
-
   const transaction={
 
     id:
@@ -3288,13 +2939,9 @@ function registerRecurring(
       "Pago recurrente"
 
   };
-
-
   m.transactions.push(
     transaction
   );
-
-
   /*
     Si el pago recurrente es Ahorros,
     creamos el movimiento de ahorro.
@@ -3312,22 +2959,14 @@ function registerRecurring(
     );
 
   }
-
-
   save();
-
-
   state.active =
     targetMonth;
-
-
   save();
 
   render();
 
 }
-
-
 /* =========================================================
    EVENTOS RECURRENTES
 ========================================================= */
@@ -3347,12 +2986,8 @@ function attachRecurringEvents(a){
             Number(
               this.dataset.rp
             );
-
-
           const field =
             this.dataset.field;
-
-
           if(
             !state.recurring[i]
           ){
@@ -3360,8 +2995,6 @@ function attachRecurringEvents(a){
             return;
 
           }
-
-
           state.recurring[i][field] =
 
             field === "amount"
@@ -3371,8 +3004,6 @@ function attachRecurringEvents(a){
               ) || 0
 
             : this.value;
-
-
           save();
 
           render();
@@ -3382,8 +3013,6 @@ function attachRecurringEvents(a){
 
     }
   );
-
-
   a.querySelectorAll(
     "[data-register]"
   ).forEach(
@@ -3397,8 +3026,6 @@ function attachRecurringEvents(a){
             Number(
               this.dataset.register
             );
-
-
           registerRecurring(i);
 
         }
@@ -3406,8 +3033,6 @@ function attachRecurringEvents(a){
 
     }
   );
-
-
   a.querySelectorAll(
     "[data-delete-rp]"
   ).forEach(
@@ -3421,8 +3046,6 @@ function attachRecurringEvents(a){
             Number(
               this.dataset.deleteRp
             );
-
-
           if(
             confirm(
               "¿Eliminar este pago recurrente?"
@@ -3433,8 +3056,6 @@ function attachRecurringEvents(a){
               i,
               1
             );
-
-
             save();
 
             render();
@@ -3448,8 +3069,6 @@ function attachRecurringEvents(a){
   );
 
 }
-
-
 /* =========================================================
    AÑADIR RECURRENTE
 ========================================================= */
@@ -3488,15 +3107,11 @@ function addRecurring(){
       ""
 
   });
-
-
   save();
 
   render();
 
 }
-
-
 /* =========================================================
    TABLA TRANSACCIONES
 ========================================================= */
@@ -3534,8 +3149,6 @@ function renderTransactionTable(m){
     `;
 
   }
-
-
   const rows =
     m.transactions.map(
       (t,i)=>`
@@ -3551,8 +3164,6 @@ function renderTransactionTable(m){
               data-field="date">
 
           </td>
-
-
           <td>
 
             <input
@@ -3562,8 +3173,6 @@ function renderTransactionTable(m){
               data-field="desc">
 
           </td>
-
-
           <td>
 
             <select
@@ -3593,8 +3202,6 @@ function renderTransactionTable(m){
             </select>
 
           </td>
-
-
           <td>
 
             <input
@@ -3605,8 +3212,6 @@ function renderTransactionTable(m){
               data-field="amount">
 
           </td>
-
-
           <td>
 
             <select
@@ -3647,8 +3252,6 @@ function renderTransactionTable(m){
             </select>
 
           </td>
-
-
           <td>
 
             ${
@@ -3690,8 +3293,6 @@ function renderTransactionTable(m){
             }
 
           </td>
-
-
           <td>
 
             <input
@@ -3701,8 +3302,6 @@ function renderTransactionTable(m){
               data-field="note">
 
           </td>
-
-
           <td class="actions">
 
             ${
@@ -3723,8 +3322,6 @@ function renderTransactionTable(m){
               : ""
 
             }
-
-
             ${
               t.recurringId
 
@@ -3743,8 +3340,6 @@ function renderTransactionTable(m){
               : ""
 
             }
-
-
             <button
               class="danger"
               data-delete-tx="${i}">
@@ -3759,8 +3354,6 @@ function renderTransactionTable(m){
 
       `
     ).join("");
-
-
   return `
 
     <table>
@@ -3814,8 +3407,6 @@ function renderTransactionTable(m){
   `;
 
 }
-
-
 /* =========================================================
    AÑADIR TRANSACCIÓN
 ========================================================= */
@@ -3824,8 +3415,6 @@ function addTx(){
 
   const m =
     month();
-
-
   m.transactions.push({
 
     id:
@@ -3869,15 +3458,11 @@ function addTx(){
       ""
 
   });
-
-
   save();
 
   render();
 
 }
-
-
 /* =========================================================
    EVENTOS TRANSACCIONES
 ========================================================= */
@@ -3886,8 +3471,6 @@ function attachTransactionEvents(a){
 
   const m =
     month();
-
-
   a.querySelectorAll(
     "[data-tx]"
   ).forEach(
@@ -3901,12 +3484,8 @@ function attachTransactionEvents(a){
             Number(
               this.dataset.tx
             );
-
-
           const field =
             this.dataset.field;
-
-
           if(
             !m.transactions[i]
           ){
@@ -3914,12 +3493,8 @@ function attachTransactionEvents(a){
             return;
 
           }
-
-
           const tx =
             m.transactions[i];
-
-
           /*
             Si cambia la fecha,
             movemos la transacción al
@@ -3935,8 +3510,6 @@ function attachTransactionEvents(a){
               monthFromDate(
                 this.value
               );
-
-
             if(
               targetMonth &&
               targetMonth !==
@@ -3951,8 +3524,6 @@ function attachTransactionEvents(a){
                     existing.id ===
                     tx.id
                 );
-
-
               if(!exists){
 
                 state.months[
@@ -3962,14 +3533,10 @@ function attachTransactionEvents(a){
                 );
 
               }
-
-
               m.transactions.splice(
                 i,
                 1
               );
-
-
               /*
                 Si la transacción estaba
                 vinculada a ahorros, la
@@ -3986,8 +3553,6 @@ function attachTransactionEvents(a){
                       x.id ===
                       tx.savingsMovementId
                   );
-
-
                 if(movement){
 
                   movement.date =
@@ -3999,12 +3564,8 @@ function attachTransactionEvents(a){
                 }
 
               }
-
-
               state.active =
                 targetMonth;
-
-
               save();
 
               render();
@@ -4014,8 +3575,6 @@ function attachTransactionEvents(a){
             }
 
           }
-
-
           /*
             Cambio de categoría.
           */
@@ -4026,12 +3585,8 @@ function attachTransactionEvents(a){
 
             const oldCategory =
               tx.cat;
-
-
             tx.cat =
               this.value;
-
-
             /*
               Si pasa a Ahorros,
               creamos el movimiento.
@@ -4049,8 +3604,6 @@ function attachTransactionEvents(a){
                   "Marcus Miriam";
 
               }
-
-
               if(
                 !tx.savingsType
               ){
@@ -4059,8 +3612,6 @@ function attachTransactionEvents(a){
                   "Depósito";
 
               }
-
-
               syncSavingsFromTransaction(
                 tx,
                 oldCategory,
@@ -4068,8 +3619,6 @@ function attachTransactionEvents(a){
               );
 
             }
-
-
             /*
               Si deja de ser Ahorros,
               eliminamos el movimiento
@@ -4091,8 +3640,6 @@ function attachTransactionEvents(a){
                     x.id ===
                     tx.savingsMovementId
                 );
-
-
               if(index >= 0){
 
                 state.savings.splice(
@@ -4101,8 +3648,6 @@ function attachTransactionEvents(a){
                 );
 
               }
-
-
               tx.savingsMovementId =
                 null;
 
@@ -4118,8 +3663,6 @@ function attachTransactionEvents(a){
               Number(
                 this.value
               ) || 0;
-
-
             if(
               tx.cat ===
               "Ahorros"
@@ -4142,8 +3685,6 @@ function attachTransactionEvents(a){
 
             tx.savingsAccount =
               this.value;
-
-
             if(
               tx.savingsMovementId
             ){
@@ -4154,8 +3695,6 @@ function attachTransactionEvents(a){
                     x.id ===
                     tx.savingsMovementId
                 );
-
-
               if(movement){
 
                 movement.account =
@@ -4173,8 +3712,6 @@ function attachTransactionEvents(a){
               this.value;
 
           }
-
-
           /*
             Después de cualquier cambio
             en una transacción de Ahorros,
@@ -4194,8 +3731,6 @@ function attachTransactionEvents(a){
             );
 
           }
-
-
           save();
 
           render();
@@ -4205,8 +3740,6 @@ function attachTransactionEvents(a){
 
     }
   );
-
-
   a.querySelectorAll(
     "[data-delete-tx]"
   ).forEach(
@@ -4220,17 +3753,11 @@ function attachTransactionEvents(a){
             Number(
               this.dataset.deleteTx
             );
-
-
           const tx =
             m.transactions[i];
-
-
           if(!tx){
             return;
           }
-
-
           if(
             confirm(
               "¿Eliminar esta transacción?"
@@ -4253,8 +3780,6 @@ function attachTransactionEvents(a){
                     x.id ===
                     tx.savingsMovementId
                 );
-
-
               if(
                 savingsIndex >= 0
               ){
@@ -4267,14 +3792,10 @@ function attachTransactionEvents(a){
               }
 
             }
-
-
             m.transactions.splice(
               i,
               1
             );
-
-
             save();
 
             render();
@@ -4288,8 +3809,6 @@ function attachTransactionEvents(a){
   );
 
 }
-
-
 /* =========================================================
    PÁGINA DE AHORROS
 ========================================================= */
@@ -4298,16 +3817,10 @@ function savingsPage(a){
 
   const balances =
     savingsAccountBalances();
-
-
   const totalExcludingSofi =
     savingsTotalExcludingSofi();
-
-
   const totalAll =
     savingsTotalAll();
-
-
   /*
     KPIs
   */
@@ -4336,8 +3849,6 @@ function savingsPage(a){
 
       `
     ).join("");
-
-
   /*
     Movimientos
   */
@@ -4357,8 +3868,6 @@ function savingsPage(a){
               data-field="date">
 
           </td>
-
-
           <td>
 
             <input
@@ -4368,8 +3877,6 @@ function savingsPage(a){
               data-field="desc">
 
           </td>
-
-
           <td>
 
             <select
@@ -4397,8 +3904,6 @@ function savingsPage(a){
             </select>
 
           </td>
-
-
           <td>
 
             <select
@@ -4426,8 +3931,6 @@ function savingsPage(a){
             </select>
 
           </td>
-
-
           <td>
 
             <input
@@ -4438,8 +3941,6 @@ function savingsPage(a){
               data-field="amount">
 
           </td>
-
-
           <td>
 
             <input
@@ -4449,8 +3950,6 @@ function savingsPage(a){
               data-field="note">
 
           </td>
-
-
           <td>
 
             ${
@@ -4471,8 +3970,6 @@ function savingsPage(a){
               : ""
 
             }
-
-
             <button
               class="danger"
               data-delete-savings="${i}">
@@ -4487,8 +3984,6 @@ function savingsPage(a){
 
       `
     ).join("");
-
-
   /*
     Saldo por cuenta
   */
@@ -4501,8 +3996,6 @@ function savingsPage(a){
           balances[
             account
           ] || 0;
-
-
         return `
 
           <tr>
@@ -4544,8 +4037,6 @@ function savingsPage(a){
 
       }
     ).join("");
-
-
   a.innerHTML = `
 
     <div class="toolbar">
@@ -4559,8 +4050,6 @@ function savingsPage(a){
       </button>
 
     </div>
-
-
     <!-- KPIs -->
 
     <div class="kpis">
@@ -4568,8 +4057,6 @@ function savingsPage(a){
       ${kpiHtml}
 
     </div>
-
-
     <!-- TOTAL PRINCIPAL -->
 
     <div
@@ -4591,8 +4078,6 @@ function savingsPage(a){
         </div>
 
       </div>
-
-
       <div class="info">
 
         El total principal incluye
@@ -4604,8 +4089,6 @@ function savingsPage(a){
         de este total.
 
       </div>
-
-
       <div>
 
         Total incluyendo SoFi:
@@ -4617,8 +4100,6 @@ function savingsPage(a){
       </div>
 
     </div>
-
-
     <!-- SALDOS -->
 
     <div
@@ -4668,8 +4149,6 @@ function savingsPage(a){
       </table>
 
     </div>
-
-
     <!-- MOVIMIENTOS -->
 
     <div
@@ -4691,8 +4170,6 @@ function savingsPage(a){
         </div>
 
       </div>
-
-
       <div class="info">
 
         Los movimientos que vienen de una
@@ -4705,8 +4182,6 @@ function savingsPage(a){
         menús desplegables.
 
       </div>
-
-
       <div class="transaction-table">
 
         <table>
@@ -4761,8 +4236,6 @@ function savingsPage(a){
 
             `
           }
-
-
           <tr class="total">
 
             <td colspan="4">
@@ -4788,8 +4261,6 @@ function savingsPage(a){
     </div>
 
   `;
-
-
   /*
     Añadir movimiento
   */
@@ -4839,16 +4310,12 @@ function savingsPage(a){
             ""
 
         });
-
-
         save();
 
         render();
 
       }
     );
-
-
   /*
     Cambios
   */
@@ -4866,21 +4333,13 @@ function savingsPage(a){
             Number(
               this.dataset.savings
             );
-
-
           const field =
             this.dataset.field;
-
-
           const movement =
             state.savings[i];
-
-
           if(!movement){
             return;
           }
-
-
           /*
             No permitimos cambiar algunos
             datos estructurales desde el
@@ -4904,8 +4363,6 @@ function savingsPage(a){
               this.value;
 
           }
-
-
           /*
             Si está vinculado a una
             transacción, actualizamos
@@ -4920,8 +4377,6 @@ function savingsPage(a){
               findTransactionById(
                 movement.transactionId
               );
-
-
             if(source){
 
               if(
@@ -4932,8 +4387,6 @@ function savingsPage(a){
                   this.value;
 
               }
-
-
               if(
                 field === "amount"
               ){
@@ -4944,8 +4397,6 @@ function savingsPage(a){
                   ) || 0;
 
               }
-
-
               if(
                 field === "date"
               ){
@@ -4954,8 +4405,6 @@ function savingsPage(a){
                   this.value;
 
               }
-
-
               if(
                 field === "desc"
               ){
@@ -4964,8 +4413,6 @@ function savingsPage(a){
                   this.value;
 
               }
-
-
               if(
                 field === "note"
               ){
@@ -4974,8 +4421,6 @@ function savingsPage(a){
                   this.value;
 
               }
-
-
               /*
                 El tipo se guarda en la
                 transacción para conservarlo
@@ -4994,8 +4439,6 @@ function savingsPage(a){
             }
 
           }
-
-
           save();
 
           render();
@@ -5005,8 +4448,6 @@ function savingsPage(a){
 
     }
   );
-
-
   /*
     Eliminar movimiento
   */
@@ -5024,17 +4465,11 @@ function savingsPage(a){
             Number(
               this.dataset.deleteSavings
             );
-
-
           const movement =
             state.savings[i];
-
-
           if(!movement){
             return;
           }
-
-
           if(
             confirm(
               "¿Eliminar este movimiento de ahorros?"
@@ -5055,8 +4490,6 @@ function savingsPage(a){
                 findTransactionById(
                   movement.transactionId
                 );
-
-
               if(tx){
 
                 tx.savingsMovementId =
@@ -5065,14 +4498,10 @@ function savingsPage(a){
               }
 
             }
-
-
             state.savings.splice(
               i,
               1
             );
-
-
             save();
 
             render();
@@ -5086,8 +4515,6 @@ function savingsPage(a){
   );
 
 }
-
-
 /* =========================================================
    BUSCAR TRANSACCIÓN
 ========================================================= */
@@ -5107,8 +4534,6 @@ function findTransactionById(
         tx=>
           tx.id === id
       );
-
-
     if(found){
 
       return found;
@@ -5116,8 +4541,6 @@ function findTransactionById(
     }
 
   }
-
-
   return null;
 
 }
@@ -5147,8 +4570,6 @@ function todo(a){
               data-todo-check="${i}">
 
           </td>
-
-
           <td>
 
             <input
@@ -5156,8 +4577,6 @@ function todo(a){
               data-todo-text="${i}">
 
           </td>
-
-
           <td>
 
             <button
@@ -5174,8 +4593,6 @@ function todo(a){
 
       `
     ).join("");
-
-
   a.innerHTML = `
 
     <div class="toolbar">
@@ -5189,8 +4606,6 @@ function todo(a){
       </button>
 
     </div>
-
-
     <div class="card">
 
       <h2>
@@ -5237,8 +4652,6 @@ function todo(a){
     </div>
 
   `;
-
-
   document
     .getElementById(
       "addTodo"
@@ -5255,16 +4668,12 @@ function todo(a){
           done:false
 
         });
-
-
         save();
 
         render();
 
       }
     );
-
-
   a.querySelectorAll(
     "[data-todo-check]"
   ).forEach(
@@ -5278,12 +4687,8 @@ function todo(a){
             Number(
               this.dataset.todoCheck
             );
-
-
           state.todo[i].done =
             this.checked;
-
-
           save();
 
           render();
@@ -5293,8 +4698,6 @@ function todo(a){
 
     }
   );
-
-
   a.querySelectorAll(
     "[data-todo-text]"
   ).forEach(
@@ -5308,12 +4711,8 @@ function todo(a){
             Number(
               this.dataset.todoText
             );
-
-
           state.todo[i].text =
             this.value;
-
-
           save();
 
         }
@@ -5321,8 +4720,6 @@ function todo(a){
 
     }
   );
-
-
   a.querySelectorAll(
     "[data-delete-todo]"
   ).forEach(
@@ -5336,14 +4733,10 @@ function todo(a){
             Number(
               this.dataset.deleteTodo
             );
-
-
           state.todo.splice(
             i,
             1
           );
-
-
           save();
 
           render();
@@ -5355,8 +4748,6 @@ function todo(a){
   );
 
 }
-
-
 /* =========================================================
    EXPORTAR
 ========================================================= */
@@ -5377,48 +4768,30 @@ function downloadBackup(){
           "application/json"
       }
     );
-
-
   const url =
     URL.createObjectURL(
       blob
     );
-
-
   const link =
     document.createElement(
       "a"
     );
-
-
   link.href =
     url;
-
-
   link.download =
     "CM_Finanzas_2026_backup.json";
-
-
   document.body.appendChild(
     link
   );
-
-
   link.click();
-
-
   document.body.removeChild(
     link
   );
-
-
   URL.revokeObjectURL(
     url
   );
 
 }
-
-
 /* =========================================================
    IMPORTAR
 ========================================================= */
@@ -5427,17 +4800,11 @@ function importBackup(e){
 
   const file =
     e.target.files[0];
-
-
   if(!file){
     return;
   }
-
-
   const reader =
     new FileReader();
-
-
   reader.onload =
     function(){
 
@@ -5447,8 +4814,6 @@ function importBackup(e){
           JSON.parse(
             reader.result
           );
-
-
         if(
           !imported ||
           !imported.months
@@ -5459,8 +4824,6 @@ function importBackup(e){
           );
 
         }
-
-
         /*
           Aseguramos estructuras nuevas.
         */
@@ -5472,9 +4835,6 @@ function importBackup(e){
           imported.savings=[];
 
         }
-
-
-
         if(
           !imported.recurring
         ){
@@ -5482,8 +4842,6 @@ function importBackup(e){
           imported.recurring=[];
 
         }
-
-
         if(
           !imported.todo
         ){
@@ -5491,12 +4849,8 @@ function importBackup(e){
           imported.todo=[];
 
         }
-
-
         state =
           imported;
-
-
         /*
           Normalización.
         */
@@ -5516,8 +4870,6 @@ function importBackup(e){
                 createDefaultMonth();
 
             }
-
-
             if(
               !state.months[
                 monthName
@@ -5529,8 +4881,6 @@ function importBackup(e){
               ].transactions=[];
 
             }
-
-
             if(
               !state.months[
                 monthName
@@ -5542,8 +4892,6 @@ function importBackup(e){
               ].budgets={};
 
             }
-
-
             /*
               Garantizamos Ahorros.
             */
@@ -5563,13 +4911,9 @@ function importBackup(e){
 
           }
         );
-
-
         save();
 
         render();
-
-
       }catch(error){
 
         alert(
@@ -5580,15 +4924,11 @@ function importBackup(e){
       }
 
     };
-
-
   reader.readAsText(
     file
   );
 
 }
-
-
 /* =========================================================
    RESTABLECER
 ========================================================= */
@@ -5604,14 +4944,10 @@ function resetData(){
     localStorage.removeItem(
       "cmFinanzas2026"
     );
-
-
     state =
       structuredClone(
         defaultState
       );
-
-
     save();
 
     render();
@@ -5619,8 +4955,6 @@ function resetData(){
   }
 
 }
-
-
 /* =========================================================
    ARRANQUE
 ========================================================= */
