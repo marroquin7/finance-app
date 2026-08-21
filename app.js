@@ -1170,6 +1170,794 @@ function addNewMonth(){
   render();
 
 }
+/* =========================================================
+   PDF — REPORTE COMPLETO DEL MES
+========================================================= */
+
+function downloadMonthPDF(){
+
+  if(
+    !window.jspdf ||
+    !window.jspdf.jsPDF
+  ){
+
+    alert(
+      "El generador de PDF todavía no está disponible."
+    );
+
+    return;
+
+  }
+
+  const {
+    jsPDF
+  } = window.jspdf;
+
+  const doc =
+    new jsPDF({
+      orientation:"portrait",
+      unit:"mm",
+      format:"letter"
+    });
+
+  const monthName =
+    state.active;
+
+  const month =
+    state.months[monthName];
+
+  if(!month){
+
+    alert(
+      "No se encontró información para este mes."
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     CONFIGURACIÓN
+  ======================================================= */
+
+  const margin = 15;
+
+  const pageWidth =
+    doc.internal.pageSize.getWidth();
+
+  const pageHeight =
+    doc.internal.pageSize.getHeight();
+
+  let y = 18;
+
+
+  /* =======================================================
+     FORMATO DE DINERO
+  ======================================================= */
+
+  function money(value){
+
+    return (
+      Number(value) || 0
+    ).toLocaleString(
+      "en-US",
+      {
+        style:"currency",
+        currency:"USD"
+      }
+    );
+
+  }
+
+
+  /* =======================================================
+     ENCABEZADO
+  ======================================================= */
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(20);
+
+  doc.text(
+    "C&M FINANZAS 2026",
+    margin,
+    y
+  );
+
+  y += 9;
+
+  doc.setFontSize(15);
+
+  doc.text(
+    `REPORTE MENSUAL — ${monthName.toUpperCase()}`,
+    margin,
+    y
+  );
+
+  y += 7;
+
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  doc.setFontSize(8);
+
+  doc.text(
+    `Generado: ${new Date().toLocaleDateString("en-US")}`,
+    margin,
+    y
+  );
+
+  y += 10;
+
+
+  /* =======================================================
+     RESUMEN
+  ======================================================= */
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(13);
+
+  doc.text(
+    "RESUMEN FINANCIERO",
+    margin,
+    y
+  );
+
+  y += 6;
+
+
+  const totalExpected =
+    (month.incomes || [])
+      .reduce(
+        (sum,item) =>
+          sum +
+          (Number(item.expected) || 0),
+        0
+      );
+
+
+  const totalActual =
+    (month.incomes || [])
+      .reduce(
+        (sum,item) =>
+          sum +
+          (Number(item.actual) || 0),
+        0
+      );
+
+
+  const totalBudget =
+    Object.values(
+      month.budgets || {}
+    )
+      .reduce(
+        (sum,value) =>
+          sum +
+          (Number(value) || 0),
+        0
+      );
+
+
+  const totalSpent =
+    (month.transactions || [])
+      .reduce(
+        (sum,t) =>
+          sum +
+          Math.abs(
+            Number(t.amount) || 0
+          ),
+        0
+      );
+
+
+  const remaining =
+    totalActual -
+    totalSpent;
+  /* =======================================================
+     AHORROS DEL MES
+  ======================================================= */
+
+ const monthSavings =
+  (state.savings || [])
+    .filter(
+      movement => {
+
+        /*
+          Si el movimiento tiene
+          sourceMonth, usamos ese valor.
+        */
+
+        if(
+          movement.sourceMonth
+        ){
+
+          return (
+            movement.sourceMonth ===
+            monthName
+          );
+
+        }
+
+
+        /*
+          Si no tiene sourceMonth,
+          usamos la fecha del movimiento.
+        */
+
+        if(
+          movement.date
+        ){
+
+          return (
+            monthFromDate(
+              movement.date
+            ) === monthName
+          );
+
+        }
+
+
+        return false;
+
+      }
+    );
+
+  const totalSavings =
+    monthSavings.reduce(
+      (sum,movement) => {
+
+        const amount =
+          Number(
+            movement.amount
+          ) || 0;
+
+        if(
+          movement.type === "Retiro"
+        ){
+
+          return sum - amount;
+
+        }
+
+        return sum + amount;
+
+      },
+      0
+    );
+
+  doc.autoTable({
+
+    startY:y,
+
+    margin:{
+      left:margin,
+      right:margin
+    },
+
+    head:[
+      [
+        "Concepto",
+        "Monto"
+      ]
+    ],
+
+    body:[
+      [
+        "Ingresos esperados",
+        money(totalExpected)
+      ],
+
+      [
+        "Ingresos reales",
+        money(totalActual)
+      ],
+
+      [
+        "Presupuesto",
+        money(totalBudget)
+      ],
+
+      [
+        "Gastos",
+        money(totalSpent)
+      ],
+[
+  "Ahorros del mes",
+  money(totalSavings)
+],
+      [
+        "Disponible",
+        money(remaining)
+      ]
+    ],
+
+    theme:"grid",
+
+    styles:{
+      fontSize:9,
+      cellPadding:3
+    },
+
+    headStyles:{
+      fontStyle:"bold"
+    }
+
+  });
+
+
+  y =
+    doc.lastAutoTable.finalY +
+    10;
+
+
+  /* =======================================================
+     INGRESOS
+  ======================================================= */
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(13);
+
+  doc.text(
+    "INGRESOS",
+    margin,
+    y
+  );
+
+  y += 6;
+
+
+  const incomeRows =
+    (month.incomes || [])
+      .map(
+        item => [
+
+          item.name || "",
+
+          money(item.expected),
+
+          money(item.actual),
+
+          money(
+            (Number(item.actual) || 0) -
+            (Number(item.expected) || 0)
+          )
+
+        ]
+      );
+
+
+  doc.autoTable({
+
+    startY:y,
+
+    margin:{
+      left:margin,
+      right:margin
+    },
+
+    head:[
+      [
+        "Ingreso",
+        "Esperado",
+        "Real",
+        "Diferencia"
+      ]
+    ],
+
+    body:incomeRows,
+
+    theme:"grid",
+
+    styles:{
+      fontSize:8,
+      cellPadding:3
+    }
+
+  });
+
+
+  y =
+    doc.lastAutoTable.finalY +
+    10;
+
+  /* =======================================================
+     AHORROS DEL MES
+  ======================================================= */
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(13);
+
+  doc.text(
+    "AHORROS DEL MES",
+    margin,
+    y
+  );
+
+  y += 6;
+
+
+  const savingsRows =
+    monthSavings.map(
+      movement => [
+
+        movement.date || "",
+
+        movement.desc ||
+        "Movimiento de ahorro",
+
+        movement.account ||
+        "",
+
+        movement.type ||
+        "",
+
+        money(
+          Number(
+            movement.amount
+          ) || 0
+        )
+
+      ]
+    );
+
+
+  if(
+    savingsRows.length
+  ){
+
+    doc.autoTable({
+
+      startY:y,
+
+      margin:{
+        left:margin,
+        right:margin
+      },
+
+      head:[
+        [
+          "Fecha",
+          "Descripción",
+          "Cuenta",
+          "Tipo",
+          "Monto"
+        ]
+      ],
+
+      body:savingsRows,
+
+      theme:"grid",
+
+      styles:{
+        fontSize:8,
+        cellPadding:3
+      },
+
+      columnStyles:{
+        0:{
+          cellWidth:25
+        },
+
+        1:{
+          cellWidth:60
+        },
+
+        2:{
+          cellWidth:40
+        },
+
+        3:{
+          cellWidth:30
+        },
+
+        4:{
+          cellWidth:25,
+          halign:"right"
+        }
+      }
+
+    });
+
+    y =
+      doc.lastAutoTable.finalY +
+      5;
+
+  }else{
+
+    doc.setFont(
+      "helvetica",
+      "italic"
+    );
+
+    doc.setFontSize(9);
+
+    doc.text(
+      "No hay movimientos de ahorro registrados este mes.",
+      margin,
+      y
+    );
+
+    y += 5;
+
+  }
+
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(10);
+
+  doc.text(
+    `Total ahorrado en el mes: ${money(totalSavings)}`,
+    margin,
+    y
+  );
+
+  y += 10;
+  /* =======================================================
+     PRESUPUESTOS
+  ======================================================= */
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(13);
+
+  doc.text(
+    "PRESUPUESTO POR CATEGORÍA",
+    margin,
+    y
+  );
+
+  y += 6;
+
+
+  const budgetRows =
+    Object.entries(
+      month.budgets || {}
+    )
+      .map(
+        ([category,budget]) => {
+
+          const spent =
+            (month.transactions || [])
+              .filter(
+                t =>
+                  t.category === category
+              )
+              .reduce(
+                (sum,t) =>
+                  sum +
+                  Math.abs(
+                    Number(t.amount) || 0
+                  ),
+                0
+              );
+
+
+          return [
+
+            category,
+
+            money(budget),
+
+            money(spent),
+
+            money(
+              Number(budget || 0) -
+              spent
+            )
+
+          ];
+
+        }
+      );
+
+
+  doc.autoTable({
+
+    startY:y,
+
+    margin:{
+      left:margin,
+      right:margin
+    },
+
+    head:[
+      [
+        "Categoría",
+        "Presupuesto",
+        "Gastado",
+        "Restante"
+      ]
+    ],
+
+    body:budgetRows,
+
+    theme:"grid",
+
+    styles:{
+      fontSize:8,
+      cellPadding:3
+    }
+
+  });
+
+
+  y =
+    doc.lastAutoTable.finalY +
+    10;
+
+
+  /* =======================================================
+     TRANSACCIONES
+  ======================================================= */
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(13);
+
+  doc.text(
+    "TRANSACCIONES",
+    margin,
+    y
+  );
+
+  y += 6;
+
+
+  const transactionRows =
+    (month.transactions || [])
+      .map(
+        t => [
+
+          t.date || "",
+
+          t.desc ||
+          t.description ||
+          t.name ||
+          "",
+
+          t.cat ||
+          t.category ||
+          "",
+
+          money(t.amount)
+
+        ]
+      );
+
+
+  if(
+    transactionRows.length
+  ){
+
+    doc.autoTable({
+
+      startY:y,
+
+      margin:{
+        left:margin,
+        right:margin
+      },
+
+      head:[
+        [
+          "Fecha",
+          "Descripción",
+          "Categoría",
+          "Monto"
+        ]
+      ],
+
+      body:transactionRows,
+
+      theme:"grid",
+
+      styles:{
+        fontSize:7,
+        cellPadding:2.5
+      }
+
+    });
+
+  }else{
+
+    doc.setFont(
+      "helvetica",
+      "italic"
+    );
+
+    doc.setFontSize(9);
+
+    doc.text(
+      "No hay transacciones registradas.",
+      margin,
+      y
+    );
+
+  }
+
+
+  /* =======================================================
+     PIE DE PÁGINA
+  ======================================================= */
+
+  const pageCount =
+    doc.internal.getNumberOfPages();
+
+
+  for(
+    let i = 1;
+    i <= pageCount;
+    i++
+  ){
+
+    doc.setPage(i);
+
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    doc.setFontSize(8);
+
+    doc.text(
+      `C&M Finanzas 2026 — ${monthName}`,
+      margin,
+      pageHeight - 8
+    );
+
+    doc.text(
+      `Página ${i} de ${pageCount}`,
+      pageWidth - margin,
+      pageHeight - 8,
+      {
+        align:"right"
+      }
+    );
+
+  }
+
+
+  /* =======================================================
+     DESCARGAR
+  ======================================================= */
+
+  const filename =
+    `Finanzas-${monthName
+      .replace(/\s+/g,"-")}.pdf`;
+
+  doc.save(
+    filename
+  );
+
+}
 
 /* =========================================================
    RENDER PRINCIPAL
@@ -1841,6 +2629,14 @@ function monthly(a){
 
       </button>
 
+       <button
+    class="primary"
+    id="downloadMonthPDF">
+
+    📄 Descargar PDF
+
+  </button>
+
     </div>
     <!-- KPIS -->
 
@@ -2360,6 +3156,14 @@ function monthly(a){
       "click",
       addTx
     );
+    document
+  .getElementById(
+    "downloadMonthPDF"
+  )
+  .addEventListener(
+    "click",
+    downloadMonthPDF
+  );
   document
     .getElementById(
       "newTxBottom"
