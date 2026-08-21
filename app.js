@@ -136,15 +136,6 @@ const savingsMovementTypes = [
 ];
 
 
-const taxesCategories = [
-
-  "Federal",
-  "California",
-  "Estimated Taxes",
-  "Otros"
-
-];
-
 
 /* =========================================================
    MES POR FECHA
@@ -406,8 +397,6 @@ const defaultState = {
 
   savings:[],
 
-  taxes:[],
-
   todo:[]
 
 };
@@ -456,10 +445,6 @@ function loadState(){
 
     if(!parsed.savings){
       parsed.savings=[];
-    }
-
-    if(!parsed.taxes){
-      parsed.taxes=[];
     }
 
     if(!parsed.todo){
@@ -1172,55 +1157,6 @@ function syncAllSavingsTransactions(){
 }
 
 
-/* =========================================================
-   TAXES
-========================================================= */
-
-function taxesTotals(){
-
-  const total =
-    state.taxes.reduce(
-      (sum,x)=>
-        sum +
-        Number(
-          x.amount || 0
-        ),
-      0
-    );
-
-
-  const byCategory={};
-
-
-  state.taxes.forEach(
-    x=>{
-
-      const category =
-        x.category ||
-        "Otros";
-
-
-      byCategory[category] =
-        (
-          byCategory[category] || 0
-        ) +
-        Number(
-          x.amount || 0
-        );
-
-    }
-  );
-
-
-  return {
-
-    total,
-    byCategory
-
-  };
-
-}
-
 
 /* =========================================================
    NAVEGACIÓN
@@ -1236,7 +1172,6 @@ function renderNav(){
     "Dashboard",
     ...months,
     "Ahorros",
-    "Taxes",
     "TO DO"
   ];
 
@@ -1405,13 +1340,6 @@ function render(){
       savingsPage(app);
 
     }
-    else if(
-      state.active === "Taxes"
-    ){
-
-      taxesPage(app);
-
-    }
     else{
 
       todo(app);
@@ -1518,9 +1446,6 @@ function dashboard(a){
     savingsTotalExcludingSofi();
 
 
-  const taxes =
-    taxesTotals();
-
 
   const savingsRows =
     savingsAccounts.map(
@@ -1542,30 +1467,6 @@ function dashboard(a){
               savingsBalances[account]
             )}
 
-          </td>
-
-        </tr>
-
-      `
-    ).join("");
-
-
-  const taxRows =
-    taxesCategories.map(
-      category=>`
-
-        <tr>
-
-          <td>
-            ${esc(category)}
-          </td>
-
-          <td class="num">
-            ${money(
-              taxes.byCategory[
-                category
-              ] || 0
-            )}
           </td>
 
         </tr>
@@ -1705,7 +1606,7 @@ function dashboard(a){
     </div>
 
 
-    <!-- AHORROS + TAXES -->
+    <!-- AHORROS -->
 
     <div class="dashboard-summary-grid">
 
@@ -1775,62 +1676,6 @@ function dashboard(a){
         </table>
 
       </div>
-
-
-      <div class="card">
-
-        <div class="card-header">
-
-          <h2>
-            Resumen de Taxes
-          </h2>
-
-          <button
-            class="small-btn"
-            id="goTaxes">
-
-            Ver Taxes
-
-          </button>
-
-        </div>
-
-
-        <table>
-
-          <tr>
-
-            <th>
-              Categoría
-            </th>
-
-            <th class="num">
-              Total
-            </th>
-
-          </tr>
-
-          ${taxRows}
-
-
-          <tr class="total">
-
-            <td>
-              TOTAL TAXES
-            </td>
-
-            <td class="num">
-              ${money(taxes.total)}
-            </td>
-
-          </tr>
-
-        </table>
-
-      </div>
-
-    </div>
-
 
     <!-- INSTRUCCIONES -->
 
@@ -1913,16 +1758,6 @@ function dashboard(a){
     .addEventListener(
       "click",
       ()=>go("Ahorros")
-    );
-
-
-  document
-    .getElementById(
-      "goTaxes"
-    )
-    .addEventListener(
-      "click",
-      ()=>go("Taxes")
     );
 
 }
@@ -5287,447 +5122,6 @@ function findTransactionById(
 
 }
 
-
-/* =========================================================
-   TAXES
-========================================================= */
-
-function taxesPage(a){
-
-  const totalsData =
-    taxesTotals();
-
-
-  const rows =
-    state.taxes.map(
-      (x,i)=>`
-
-        <tr>
-
-          <td>
-
-            <input
-              type="date"
-              value="${esc(x.date || "")}"
-              data-tax="${i}"
-              data-field="date">
-
-          </td>
-
-
-          <td>
-
-            <input
-              value="${esc(x.desc || "")}"
-              placeholder="Descripción"
-              data-tax="${i}"
-              data-field="desc">
-
-          </td>
-
-
-          <td>
-
-            <select
-              data-tax="${i}"
-              data-field="category">
-
-              ${taxesCategories.map(
-                category=>`
-
-                  <option
-                    value="${esc(category)}"
-                    ${
-                      (
-                        x.category ||
-                        "Otros"
-                      ) === category
-                      ? "selected"
-                      : ""
-                    }>
-
-                    ${esc(category)}
-
-                  </option>
-
-                `
-              ).join("")}
-
-            </select>
-
-          </td>
-
-
-          <td>
-
-            <input
-              type="number"
-              step=".01"
-              value="${Number(x.amount || 0)}"
-              data-tax="${i}"
-              data-field="amount">
-
-          </td>
-
-
-          <td>
-
-            <input
-              value="${esc(x.note || "")}"
-              placeholder="Comentario"
-              data-tax="${i}"
-              data-field="note">
-
-          </td>
-
-
-          <td>
-
-            <button
-              class="danger"
-              data-delete-tax="${i}">
-
-              ×
-
-            </button>
-
-          </td>
-
-        </tr>
-
-      `
-    ).join("");
-
-
-  const categoryRows =
-    taxesCategories.map(
-      category=>`
-
-        <tr>
-
-          <td>
-            ${esc(category)}
-          </td>
-
-          <td class="num">
-            ${money(
-              totalsData.byCategory[
-                category
-              ] || 0
-            )}
-          </td>
-
-        </tr>
-
-      `
-    ).join("");
-
-
-  a.innerHTML = `
-
-    <div class="kpis">
-
-      <div class="kpi">
-
-        <div class="label">
-          Total Taxes
-        </div>
-
-        <div class="value">
-          ${money(
-            totalsData.total
-          )}
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <div
-      class="grid">
-
-      <div class="card">
-
-        <div class="card-header">
-
-          <h2>
-            TAXES
-          </h2>
-
-          <button
-            class="primary"
-            id="addTax">
-
-            + Movimiento
-
-          </button>
-
-        </div>
-
-
-        <table>
-
-          <tr>
-
-            <th>
-              Fecha
-            </th>
-
-            <th>
-              Descripción
-            </th>
-
-            <th>
-              Categoría
-            </th>
-
-            <th>
-              Importe
-            </th>
-
-            <th>
-              Comentario
-            </th>
-
-            <th></th>
-
-          </tr>
-
-          ${
-            rows ||
-
-            `
-
-              <tr>
-
-                <td
-                  colspan="6"
-                  class="empty">
-
-                  No hay movimientos de taxes.
-
-                </td>
-
-              </tr>
-
-            `
-          }
-
-
-          <tr class="total">
-
-            <td colspan="3">
-              TOTAL TAXES
-            </td>
-
-            <td class="num">
-              ${money(
-                totalsData.total
-              )}
-            </td>
-
-            <td colspan="2"></td>
-
-          </tr>
-
-        </table>
-
-      </div>
-
-
-      <div class="card">
-
-        <h2>
-          Resumen por categoría
-        </h2>
-
-        <table>
-
-          <tr>
-
-            <th>
-              Categoría
-            </th>
-
-            <th class="num">
-              Total
-            </th>
-
-          </tr>
-
-          ${categoryRows}
-
-
-          <tr class="total">
-
-            <td>
-              TOTAL
-            </td>
-
-            <td class="num">
-              ${money(
-                totalsData.total
-              )}
-            </td>
-
-          </tr>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  /*
-    Añadir tax
-  */
-
-  document
-    .getElementById(
-      "addTax"
-    )
-    .addEventListener(
-      "click",
-      ()=>{
-
-        state.taxes.push({
-
-          id:
-            "tax-" +
-            Date.now(),
-
-          date:
-            new Date()
-              .toISOString()
-              .slice(0,10),
-
-          desc:
-            "",
-
-          category:
-            "Otros",
-
-          amount:
-            0,
-
-          note:
-            ""
-
-        });
-
-
-        save();
-
-        render();
-
-      }
-    );
-
-
-  /*
-    Editar taxes
-  */
-
-  a.querySelectorAll(
-    "[data-tax]"
-  ).forEach(
-    input=>{
-
-      input.addEventListener(
-        "change",
-        function(){
-
-          const i =
-            Number(
-              this.dataset.tax
-            );
-
-
-          const field =
-            this.dataset.field;
-
-
-          if(
-            !state.taxes[i]
-          ){
-
-            return;
-
-          }
-
-
-          state.taxes[i][field] =
-
-            field === "amount"
-
-            ? Number(
-                this.value
-              ) || 0
-
-            : this.value;
-
-
-          save();
-
-          render();
-
-        }
-      );
-
-    }
-  );
-
-
-  /*
-    Eliminar taxes
-  */
-
-  a.querySelectorAll(
-    "[data-delete-tax]"
-  ).forEach(
-    button=>{
-
-      button.addEventListener(
-        "click",
-        function(){
-
-          const i =
-            Number(
-              this.dataset.deleteTax
-            );
-
-
-          if(
-            confirm(
-              "¿Eliminar este movimiento de taxes?"
-            )
-          ){
-
-            state.taxes.splice(
-              i,
-              1
-            );
-
-
-            save();
-
-            render();
-
-          }
-
-        }
-      );
-
-    }
-  );
-
-}
-
-
 /* =========================================================
    TO DO
 ========================================================= */
@@ -6079,14 +5473,6 @@ function importBackup(e){
 
         }
 
-
-        if(
-          !imported.taxes
-        ){
-
-          imported.taxes=[];
-
-        }
 
 
         if(
